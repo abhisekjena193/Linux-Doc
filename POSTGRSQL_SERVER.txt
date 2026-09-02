@@ -1,0 +1,426 @@
+
+  Postgresql:
+===============
+
+>> PostgreSQL, also known as Postgres, is a free and open-source relational database management 
+   system emphasizing extensibility and SQL compliance.
+   
+   It was originally named POSTGRES, referring to its origins as a successor to the Ingres database developed at the University of California .
+   
+>>Profile for PostgreSQL : 
+===========================
+
+package name: postgresql17-server
+
+service/daemon : postgresql17.service
+
+port number : 5432/tcp 
+
+configuration file : /var/lib/pgsql/17/data/postgresql.conf , /var/lib/pgsql/10/data/pg_hba.conf
+
+user name: postgres
+
+process name : postgres
+
+
+Installtion process
+===============
+ # yum install vim net-tools bind-utils wget -y
+ 
+>> Go to this link for instaltion :
+
+ https://www.postgresql.org/download/linux/redhat/
+ 
+
+
+>>Now copy this script and paste :
+
+sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+sudo dnf -qy module disable postgresql
+sudo dnf install -y postgresql17-server
+sudo /usr/pgsql-17/bin/postgresql-17-setup initdb
+sudo systemctl enable postgresql-17
+sudo systemctl start postgresql-17
+
+# systemctl status postgresql-17
+ 
+# ps -ef | grep postgres | grep -v grep  // get here process id 
+
+postgres   36786       1  0 09:59 ?        00:00:00 /usr/pgsql-17/bin/postgres -D /var/lib/pgsql/17/data/
+
+
+# ss -ntlup | grep 36786
+
+tcp   LISTEN 0      200        127.0.0.1:5432      0.0.0.0:*    users:(("postgres",pid=36786,fd=8))
+tcp   LISTEN 0      200            [::1]:5432         [::]:*    users:(("postgres",pid=36786,fd=7))
+
+ 
+NOW,Operation in database
+============================
+switch to postgres user and acess the server 
+----------------------------------------------
+[root@rolex ~]# su - postgres
+[postgres@rolex ~]$ psql
+psql (17.2)
+Type "help" for help.
+
+postgres=#
+
+basic commands
+---------------
+
+1.	\c <dbname> // To connect or use database  
+
+2.	\dt   // to list tables/schema inside database  
+
+3.	\! cls // To clear the screen in windows if you access the database using cmd prompt 
+
+4.	\! clear  // To clear screen in linux
+
+5.	\list  // List of databases
+
+6.	\d [table name] ; // To describe table 
+
+7.	\d+ [table name] ; // more detail desciption 
+
+8.	\? list all the commands
+
+9.	\l list databases
+
+10.	\conninfo display information about current connection
+
+11.	\c [DBNAME] connect to new database, e.g., \c template1
+
+12.	\dt list tables of the public schema
+
+13.	\dt <schema-name>.* list tables of certain schema, e.g., \dt public.*
+
+14.	\dt *.* list tables of all schemas
+
+15.	\q  //quit psql
+
+  
+Create a database
+---------------------
+  
+
+
+   # CREATE DATABASE yourdbname; // To create database 
+
+   #\list
+ 
+example:
+
+   postgres=# CREATE DATABASE anshu ;
+   postgres-# ; // if bychance you miss the above semicolon than give semicolon here.
+   CREATE DATABASE
+   postgres=# \l
+                                                     List of databases
+   Name    |  Owner   | Encoding | Locale Provider |   Collate   |    Ctype    | Locale | ICU Rules |   Access privileges
+-----------+----------+----------+-----------------+-------------+-------------+--------+-----------+-----------------------
+ anshu     | postgres | UTF8     | libc            | en_US.UTF-8 | en_US.UTF-8 |        |           |
+ postgres  | postgres | UTF8     | libc            | en_US.UTF-8 | en_US.UTF-8 |        |           |
+ template0 | postgres | UTF8     | libc            | en_US.UTF-8 | en_US.UTF-8 |        |           | =c/postgres          +
+           |          |          |                 |             |             |        |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | en_US.UTF-8 | en_US.UTF-8 |        |           | =c/postgres          +
+           |          |          |                 |             |             |        |           | postgres=CTc/postgres
+(4 rows)
+
+postgres=#   \c anshu
+You are now connected to database "anshu" as user "postgres".
+
+
+  CRUD operations
+=======================
+ In PostgreSQL involve Create, Read, Update, and Delete operations, which are fundamental for working with a database. Below is a guide to perform these operations using SQL queries in PostgreSQL:
+
+CREATE:-
+
+ > create table students (std_id INT PRIMARY KEY, std_name VARCHAR(240) NOT NULL, std_program VARCHAR(240) NOT NULL, std_stream VARCHAR(240) NOT NULL);  
+
+ > \d students ; // To describe table 
+ 
+ 
+                         Table "public.students"
+   Column    |          Type          | Collation | Nullable | Default
+-------------+------------------------+-----------+----------+---------
+ std_id      | integer                |           | not null |
+ std_name    | character varying(240) |           | not null |
+ std_program | character varying(240) |           | not null |
+ std_stream  | character varying(240) |           | not null |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (std_id)
+
+
+ > \d+ students ; // more detail desciption 
+ 
+ 
+ anshu-# \d+ students
+                                                   Table "public.students"
+   Column    |          Type          | Collation | Nullable | Default | Storage  | Compression | Stats target | Description
+-------------+------------------------+-----------+----------+---------+----------+-------------+--------------+-------------
+ std_id      | integer                |           | not null |         | plain    |             |              |
+ std_name    | character varying(240) |           | not null |         | extended |             |              |
+ std_program | character varying(240) |           | not null |         | extended |             |              |
+ std_stream  | character varying(240) |           | not null |         | extended |             |              |
+Indexes:
+    "students_pkey" PRIMARY KEY, btree (std_id)
+Access method: heap
+
+ 
+ 
+INSERT:-
+
+ //one way:
+ > insert into students (std_id , std_name , std_program, std_stream) values (1 , 'kalia', 'Btech', 'CSE') ; 
+
+ //second way:
+ > insert into students values (2, 'balia', 'MCA', 'CSE');
+
+ > insert into students values (3, 'jaga', 'BCA', 'CSE'); 
+ 
+ SELECT:-
+
+ > select * from students ;
+ 
+ postgres=# select * from students;
+ std_id | std_name | std_program | std_stream
+--------+----------+-------------+------------
+      1 | kalia    | Btech       | CSE
+      2 | balia    | MCA         | CSE
+      3 | jaga     | BCA         | CSE
+(3 rows)
+
+
+ > select std_stream,std_name from students where std_id=1 ;
+ 
+ std_stream | std_name
+------------+----------
+ CSE        | kalia
+(1 row)
+
+
+UPDATE:-
+
+ > update students set std_stream='ENG' where std_id=2;
+ 
+ UPDATE 1
+
+ > select * from students ;
+ 
+  std_id | std_name | std_program | std_stream
+--------+----------+-------------+------------
+      1 | kalia    | Btech       | CSE
+      3 | jaga     | BCA         | CSE
+      2 | balia    | MCA         | ENG
+(3 rows)
+
+DELETE:-
+
+
+ > delete from students where std_id=3 ;
+ 
+   DELETE 1
+
+ > select * from students ;
+ 
+    std_id | std_name | std_program | std_stream
+--------+----------+-------------+------------
+      1 | kalia    | Btech       | CSE
+      2 | balia    | MCA         | ENG
+(2 rows)
+
+
+ // shows all tables in the current schema:
+
+ > \dt
+
+            List of relations
+ Schema |   Name   | Type  |  Owner
+--------+----------+-------+----------
+ public | students | table | postgres
+(1 row)
+ 
+
+CREATE A USER:-
+================
+
+   # CREATE USER youruser WITH ENCRYPTED PASSWORD 'yourpass';    // To create user with password 
+   
+   ex:
+   anshu=# CREATE USER user1 WITH ENCRYPTED PASSWORD 'redhat';
+   CREATE ROLE
+   
+  
+   #\du // To list users      
+	
+	                             List of roles
+ Role name |                         Attributes
+-----------+------------------------------------------------------------
+ postgres  | Superuser, Create role, Create DB, Replication, Bypass RLS
+ user1     |
+
+
+   # GRANT ALL PRIVILEGES ON DATABASE dbname TO username;  // To grant all privilages to user in db 
+   
+   ex:
+   anshu=# GRANT ALL PRIVILEGES ON DATABASE anshu TO user1;
+   GRANT
+
+   # \l  // To verify 
+   
+CHANGE THE OWNER OF TABLE
+==============================
+   //  changing the owner of a table with following query
+
+   # ALTER TABLE public.<tablename> OWNER to ownername;
+ 
+    ex:
+    anshu=# ALTER TABLE public.students OWNER to user1;
+    ALTER TABLE
+	
+   # \dt
+   
+   ex:
+            List of relations
+ Schema |   Name   | Type  | Owner
+--------+----------+-------+-------
+ public | students | table | user1
+
+
+
+ 
+
+ >> By default, PostgreSQL allows to listen for the localhost connection. It does not allow a remote TCP/IP connection. 
+     To allow a remoteTCP/IP connection.
+
+  
+ >>  Change the listening address in the "postgresql.conf" file.
+ 
+ # \q
+ # ctrl+d //logout from postgresql user
+   
+ // To find the postgresql configuration file 
+
+  # find  / -iname postgresql.conf  (find linux )
+
+  /var/lib/pgsql/17/data/postgresql.conf
+
+ 
+  # vim /var/lib/pgsql/17/data/postgresql.conf
+
+	go to line number 60
+	copy the line and uncomment the new copied line and do this changes
+	
+   listen_addresses = '*'     // replace localhost to  "*"
+ 
+  :wq 
+
+
+>> By default, PostgreSQL accepts connections only from the localhost. It refuses remote connections. 
+    This is controlled by applying an access control rule that allows a user to log in from an IP address after 
+    providing a valid password (the md5 keyword). To accept a remote connection . 
+
+>> Add a client authentication entry to the pg_hba.conf file.
+
+   
+   # find  / -iname pg_hba.conf
+    /var/lib/pgsql/17/data/pg_hba.conf
+
+   # vim  /var/lib/pgsql/17/data/pg_hba.conf 
+   
+   go the line number 115 , copy that line and paste it , now comment the 115 number line and uncomment 116 number line 
+   and do this changes.
+
+114 # IPv4 local connections:
+115 #host    all             all             127.0.0.1/32            scram-sha-256
+116 host    all             all             0.0.0.0/0            md5
+
+
+  :wq
+
+  # systemctl restart postgresql-17
+
+  # systemctl status  postgresql-17  
+
+// To access database localy 
+
+  # psql -U <username> -h 127.0.0.1 -d <database> -W
+  
+  ex:
+  
+  [root@rolex ~]# psql -U user1 -h 127.0.0.1 -d anshu -W
+Password:redhat
+psql (17.2)
+Type "help" for help.
+
+anshu=> \dt
+         List of relations
+ Schema |   Name   | Type  | Owner
+--------+----------+-------+-------
+ public | students | table | user1
+(1 row)
+
+
+
+     
+// To connect remotely to postgresql server  
+
+
+ #  yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+
+
+ # yum install -y postgresql17
+
+ # psql -h <Server_IP> -U <username> -d <dbname> -W
+ 
+ EX:
+ 
+[root@badboy1 ~]# psql -h 172.16.16.100 -U user1 -d anshu -W
+Password:
+psql (17.2)
+Type "help" for help.
+
+anshu=> \du
+                             List of roles
+ Role name |                         Attributes
+-----------+------------------------------------------------------------
+ postgres  | Superuser, Create role, Create DB, Replication, Bypass RLS
+ user1     |
+
+anshu=> select * from students
+anshu-> ;
+ std_id | std_name | std_program | std_stream
+--------+----------+-------------+------------
+      1 | kalia    | Btech       | CSE
+      2 | balia    | MCA         | ENG
+(2 rows)
+   
+   see whether it fully remotely acces or not:
+   # insert into students values (10, 'harihara', 'BCA', 'CSE');
+   
+
+REVOKE:-
+
+   // Revoke insert privilege for the public on table films:
+
+   > REVOKE INSERT ON TABLE <table name> FROM <user name>;
+   
+   ex:
+   anshu=# REVOKE INSERT ON TABLE students FROM user1;
+   REVOKE
+	
+#######################
+   // Revoke all privileges from user manuel on view kinds:
+
+
+   > REVOKE ALL PRIVILEGES ON kinds FROM manuel;
+
+  // By default all public schemas will be available for regular (non-superuser) users. 
+     To prevent this, login as a superuser and issue a command:
+
+   > REVOKE ALL ON DATABASE somedatabase FROM PUBLIC;
+
+  // This will revoke all permissions from all users for a given database.
+  
+#########################

@@ -1,0 +1,78 @@
+APACHE TOMCAT (For Tomcat 9)
+****************************
+# sudo dnf config-manager --set-enabled crb
+
+# sudo dnf install epel-release epel-next-release net-tools bind-utils -y
+
+# dnf install java-11-openjdk java-11-openjdk-devel -y (java package download for centos9)
+
+# java --version (to check java version)
+
+# yum install tomcat tomcat-webapps tomcat-admin-webapps -y (To install Tomcat package)
+
+# systemctl  enable --now tomcat (To enable Tomcat package)
+
+# systemctl  start   tomcat (To start tomcat package)
+
+# systemctl  status   tomcat (To check Tomcat package status)
+
+# systemctl  restart tomcat (To restart tomcat package)
+
+# ss -ntlup | grep -i 8080 (To check port listen)
+
+# yum install wget  curl -y
+
+# yum install firewalld -y (To install firewalld package)
+ 
+# firewall-cmd  --permanent --add-port=8080/tcp (To add port in firewall)
+
+# firewall-cmd  --reload
+ 
+# firewall-cmd  --list-all
+
+# wget https://tomcat.apache.org/tomcat-8.5-doc/appdev/sample/sample.war (sample war file for tomcat 9 to deploy)
+
+# ls -ltr (to check the sample.war file is installed)
+
+# cp -av sample.war /usr/share/tomcat/webapps/ (copy the sample.war file)
+
+# systemctl restart tomcat
+
+#  cd /usr/share/tomcat/webapps/
+
+#   ll
+
+#    vim /etc/tomcat/tomcat-users.xml
+
+// Add below lines above </tomcat-users> which is in last line.
+
+<role rolename="admin"/>
+<role rolename="admin-gui"/>
+<role rolename="admin-script"/>
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<user username="admin" password="redhat" roles="admin,admin-gui,admin-script,manager-gui,manager-script,manager-jmx,manager-status"/>
+<user username="deployer" password="deployer" roles="manager-script"/>
+<user username="tomcat" password="redhat123" roles="manager-gui"/>
+
+</tomcat-users>
+
+ # systemctl restart tomcat
+
+ # systemctl status tomcat
+
+   28  cd /usr/share/tomcat/webapps/manager/META-INF/
+   29  ll
+   30  vim context.xml ---------(allows="^.*$")
+   31  cd
+   32  
+   33  systemctl restart tomcat
+   34  systemctl  status tomcat
+   35  ss -ntlup | grep 8080
+   36  cd -
+   37  cat context.xml
+   38  pwd
+   39  cat context.xml
+   40  cd

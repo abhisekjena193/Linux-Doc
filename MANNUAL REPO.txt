@@ -1,0 +1,55 @@
+                                                       HOW TO CREATE MANUAL REPO SERVER ON CENTOS 9
+                                                       ############################################
+
+
+>> On virtual machine 1st go to Device option, then click on optical drives then select centos9 iso image.
+
+Next
+   
+    # df -Th (to show the iso image is mounted )
+
+    # cd   /run/media/root/CentOS-stream-9-BaseOS-X86_64
+
+    # ll 
+
+    # mkdir /redhat 
+
+    # cp -av * /redhat (centos 9 iso iamge all package copy to /redhat folder)
+
+    # umount /dev/sr0 (unmoun the iso image)
+
+  >>  Then remove the iso image to optical drivers
+
+   
+>> Now create repo file
+
+>> Go to repo directory path 
+
+    # cd /etc/yum.repos.d/
+
+    # ll
+
+    # mv * /opt
+
+    # vim satya.repo (create a repo file )
+
+ 
+[AppStream]
+name=satya
+baseurl=file:///redhat/AppStream
+gpgcheck=0
+
+
+[BaseOS]
+name=inku
+baseurl=file:///redhat/BaseOS
+gpgcheck=0 
+
+
+   # yum clean all
+
+   # yum repolist 
+
+   Now you can download package in offline 
+
+   

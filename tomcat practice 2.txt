@@ -1,0 +1,86 @@
+                                                                     Apache Tomcat/10.1.28
+                                                                     #####################
+
+
+
+ #  dnf install java-17-openjdk-devel -y (to install java 17 package )
+
+ # cat > /etc/profile.d/java.sh <<'EOF'
+export JAVA_HOME=$(dirname $(dirname $(readlink $(readlink $(which java)))))
+export PATH=$PATH:$JAVA_HOME/bin
+EOF
+
+ # source /etc/profile.d/java.sh
+
+ #  java --version
+
+ #  useradd -m -U -d /opt/tomcat -s /bin/false tomcat
+
+ #  wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.28/bin/apache-tomcat-10.1.28.tar.gz (Tomcat 10 tar file download)
+
+ 
+ #  tar -xvzf apache-tomcat-10.1.28.tar.gz  -C /opt/tomcat/ (To extract this tar file )
+
+ #  cd /opt/tomcat/
+ 
+ #   ll
+
+ #  mv apache-tomcat-10.1.28/ tomcat10 (rename)
+
+ #  ll
+
+ #  tomcat10/
+
+ #  chown -Rv tomcat:tomcat /opt/tomcat (change user owner and group owner)
+
+ #  vim /opt/tomcat/tomcat10/conf/tomcat-users.xml
+
+   Add this parameter to bottom of the line
+   
+     <role rolename="admin"/>
+<role rolename="admin-gui"/>
+<role rolename="admin-script"/>
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<user username="admin" password="redhat" roles="admin,admin-gui,admin-script,manager-gui,manager-script,manager-jmx,manager-status"/>
+<user username="deployer" password="deployer" roles="manager-script"/>
+<user username="tomcat" password="redhat123" roles="manager-gui"/>
+
+  Then save & exit 
+
+ # pwd
+
+ #  ls
+
+ #  cd tomcat10/bin/
+
+ #  ll
+
+ #  ./startup.sh
+
+ #  ss -ntlup
+
+ #  cd
+
+ #  vim  /opt/tomcat/tomcat10/webapps/manager/META-INF/context.xml
+
+     *add this parameter under Valve classname
+
+          allow="^.*$"/>
+
+     Then save & exit 
+
+ #  cd /opt/tomcat/tomcat10/bin/
+
+ #  ./shutdown.sh
+
+ #  ./startup.sh
+
+ #  ss -ntlup
+
+
+  Go to chrome browser and log in to tomcat 
+
+ 

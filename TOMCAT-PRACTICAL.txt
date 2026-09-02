@@ -1,0 +1,143 @@
+APACHE TOMCAT/9.0.62 (For centos 9)
+****************************
+# sudo dnf config-manager --set-enabled crb
+
+# sudo dnf install epel-release epel-next-release net-tools bind-utils -y
+
+
+# dnf install java-17-openjdk java-17-openjdk-devel -y (java package download for centos9)
+
+# java --version (to check java version)
+
+# yum install tomcat tomcat-webapps tomcat-admin-webapps -y (To install Tomcat package)
+
+# systemctl  enable --now tomcat (To enable Tomcat package)
+
+# systemctl  start   tomcat (To start tomcat package)
+
+# systemctl  status   tomcat (To check Tomcat package status)
+
+# ss -ntlup | grep -i 8080 (To check port listen)
+
+# yum install wget  curl -y
+
+# yum install firewalld -y (To install firewalld package) / systemctl enable --now firewalld
+ 
+# firewall-cmd  --permanent --add-port=8080/tcp (To add port in firewall)
+
+# firewall-cmd  --reload
+ 
+# firewall-cmd  --list-all
+
+# wget https://tomcat.apache.org/tomcat-8.5-doc/appdev/sample/sample.war (Tomcat sample war file for centos 9 to deploy)
+
+# ls -ltr (to check the sample.war file is installed)
+
+
+>> tomcat webapps folder where java packages like "war" or "jar" are deployed : 
+  
+   "/usr/share/tomcat/webapps"
+
+
+# cp -av sample.war /usr/share/tomcat/webapps/ (copy the sample.war file)
+
+# systemctl restart tomcat
+
+#  cd /usr/share/tomcat/webapps/
+
+#   ll
+
+
+>> tomcat user config file : /etc/tomcat/tomcat-users.xml
+
+definition: The tomcat-users.xml file is used to configure user accounts and roles for the built-in Tomcat Manager and other web applications. It defines which users have access to specific features in Apache Tomcat, such as managing deployed applications or monitoring the server.
+
+
+#  vim /etc/tomcat/tomcat-users.xml
+
+
+IMP NOTE: Add below lines above </tomcat-users> which is in last line.
+=========
+
+
+<role rolename="admin"/>
+<role rolename="admin-gui"/>
+<role rolename="admin-script"/>
+<role rolename="manager-gui"/>
+<role rolename="manager-script"/>
+<role rolename="manager-jmx"/>
+<role rolename="manager-status"/>
+<user username="admin" password="redhat"
+roles="admin,admin-gui,admin-script,manager-gui,manager-script,manager-jmx,manager-status"/>
+<user username="deployer" password="deployer" roles="manager-script"/>
+<user username="tomcat" password="redhat123" roles="manager-gui"/>
+
+
+
+</tomcat-users>
+
+ # systemctl restart tomcat
+
+ # systemctl status tomcat
+
+
+To open manager app on Apache Tomcat/9.0
+
+   28  cd /usr/share/tomcat/webapps/manager/META-INF/
+
+     showing - context.xml
+
+   29  ll
+   30  vim context.xml
+
+
+
+>> add a line into context.xml under valve classname --- (allow=" ^.*$	"/>)
+   then save & exit.
+ 
+Example:
+
+    <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="^.*$" />
+   
+
+   31  cd  
+   33  systemctl restart tomcat
+   34  systemctl  status tomcat
+   35  ss -ntlup | grep 8080
+   36  cd -
+   37  cat context.xml
+
+
+>> Changing the default port of Apache Tomcat on CentOS 9 involves modifying its configuration file. Here’s how you can do it step by step:
+=============================================================================================================================================
+
+	# cd /etc/tomcat/
+	# vim server.xml
+
+ > Lets Change  the default port of Apache Tomcat on CentOS 9. 
+   Ensure the new port is not already in use by another service. You can check with:
+
+	# netstat -tuln | grep <port>
+
+
+ > Change the port attribute to your desired port number. For example, to change it to port 9090:
+
+	<Connector port="9090" protocol="HTTP/1.1" 
+           connectionTimeout="20000"
+           redirectPort="8443" />
+
+	:wq!
+
+ > update the firewall rule :
+	
+	# firewall-cmd --permanent --add-port=9090/tcp ; firewall-cmd --reload : firewall-cmd --list-all
+	
+	# systemctl restart tomcat
+
+ > Test the new port by accessing your application in a browser or with curl:
+
+	# http://<your-server-ip>:9090
+
+
+   
